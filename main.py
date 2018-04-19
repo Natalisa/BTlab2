@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 #Исходные данные:
 PowerTxAs   =   20#мощность пеередатчика точки доступа WiFi дБ
-PowerTxUs   =   20#мощность пеередатчика пользовательского терминала дБ
+PowerTxUs   =   14#мощность пеередатчика пользовательского терминала дБ
 Gain        =   5#коэф усиления антены точки доступа дБи
 ClutterLosses = 12#запас мощности сигнала на проникновения сквозь стены дБ
 InterMargin =   5#запас мощности на интерференцию дБ
@@ -23,23 +23,27 @@ def ThermNoise(BW):
     return -174 + 10*math.log10(BW)
 
 #чуствительность приемного устройства пользователя в DownLink
-RxSensDl = ThermNoise(BWdl) + NoiseFigureUs +RequiredSINRdl
-print(RxSensDl)
+RxSensDl = ThermNoise(BWdl) + NoiseFigureUs + RequiredSINRdl
+print("RxSensDl",RxSensDl)
 
 #чуствительность приемного устройства пользователя в UpLink
-RxSensUl = ThermNoise(BWul) +NoiseFigureUs +RequiredSINRul
-print(RxSensUl)
+RxSensUl = ThermNoise(BWul) + NoiseFigureUs + RequiredSINRul
+print("RxSensUl",RxSensUl)
 
-#нехватате Lossfor/g откда взять?
-MAPLdl = PowerTxAs + Gain - RxSensDl - InterMargin - ClutterLosses
-MAPLul = PowerTxUs  - RxSensUl - InterMargin - ClutterLosses
-
+#расчет максимально допустимого растояния для успешного приема
+Loss=3#дБ
+MAPLdl = PowerTxAs - Loss + Gain - RxSensDl - InterMargin - ClutterLosses
+MAPLul = PowerTxUs - Loss - RxSensUl - InterMargin - ClutterLosses
+print("MAPLdl",MAPLdl,"MAPLul",MAPLul)
 def PL(d):
     return 26*math.log10(BW5) + 22.7 + 36.7*math.log10(d)
 
-d=range(1,1500)
+d=range(1,500)
 PLmas = list(map(PL,d))
 print(PLmas)
+#for i in range(40,50):
+#     print(PL(i))
+#print(PLmas)
 
 plt.plot(d,PLmas)
 plt.hold
